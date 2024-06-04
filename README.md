@@ -93,12 +93,3 @@ Sync your IDE with project eslintrc.js.
 
 Check `Run ESLint --fix on save`
 
-## Stay in touch
-
-- Author - [Igor Mardari](https://www.linkedin.com/in/igor-mardari-7code/) | [GarryOne](https://github.com/GarryOne)
-- Website - [7code.ro](https://7code.ro/)
-- Github - [@7codeRO](https://github.com/7codeRO/)
-
-## License
-
-  [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).

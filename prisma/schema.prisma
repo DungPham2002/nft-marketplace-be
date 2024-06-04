@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id                  Int     @id @default(autoincrement())
+  address             String  @unique
+  name                String
+  avatar              String
+  email               String
+  description         String
+  website             String
+  facebook            String
+  twitter             String
+  instagram           String
+  nftsOwned           Nft[]      @relation("NFTsOwned")
+  // nftsCreated         NFT[]      @relation("NFTsCreated")
+}
+
+model Nft {
+  tokenId             Int        @id @default(autoincrement())
+  ownerId             Int
+  collectionId        Int
+  name                String
+  image               String
+  website             String
+  price               Int
+  description         String
+  royalties           Int
+  size                String
+  isSelling           Boolean
+  // creatorId           Int
+  
+  
+  owner               User       @relation("NFTsOwned", fields: [ownerId], references: [id])
+  collection          Collection @relation(fields: [collectionId], references: [id])
+  // creator             User       @relation("NFTsCreated", fields: [creatorId], references: [id])
+  
+}
+
+
+model Collection {
+  id       Int     @id @default(autoincrement())
+  name     String
+  image    String
+  nfts     Nft[]
+
+  @@unique([name])
+}
