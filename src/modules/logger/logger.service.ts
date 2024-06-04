@@ -11,7 +11,7 @@ export class MyLogger implements LoggerService {
 
   private context: string;
 
-  private static LOGS_PATH = 'storage/logs';
+  private static LOGS_PATH = '../../../storage/logs';
 
   constructor() {
     this.logger = createLogger(this.getLoggerOptions(this.level));
