@@ -23,6 +23,7 @@
     {
       "source": "/favicon.ico",
       "destination": "/_ignore-favicon"
-    }
+    },
+    { "source": "/(.*)", "destination": "/api/v1" }
   ]
 }
