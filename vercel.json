@@ -18,11 +18,5 @@
               "DELETE"
           ]
       }
-  ],
-  "rewrites": [
-    {
-      "source": "/favicon.ico",
-      "destination": "/_ignore-favicon"
-    }
   ]
 }
