@@ -1,14 +1,12 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '@prisma/client';
+import { toChecksumAddress } from 'web3-utils';
+import { recoverPersonalSignature } from 'eth-sig-util';
 
 import { UserService } from '../user/user.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { GLOBAL_CONFIG } from '../../configs/global.config';
 
 import { AuthResponseDTO, LoginDTO } from './auth.dto';
-import { toChecksumAddress } from 'web3-utils';
-import { recoverPersonalSignature } from 'eth-sig-util';
 
 @Injectable()
 export class AuthService {
@@ -30,14 +28,14 @@ export class AuthService {
       user = await this.prisma.user.create({
         data: {
           address: toChecksumAddress(address),
-          name: "",
-          avatar: "",
-          email: "",
-          description: "",
-          website: "",
-          facebook: "",
-          twitter: "",
-          instagram: "",
+          name: '',
+          avatar: '',
+          email: '',
+          description: '',
+          website: '',
+          facebook: '',
+          twitter: '',
+          instagram: '',
         },
       });
     }

@@ -1,5 +1,3 @@
-import { randomBytes, scrypt } from 'crypto';
-
 // const hash = (password) => {
 //   return new Promise((resolve, reject) => {
 //     const salt = randomBytes(8).toString('hex');

@@ -1,7 +1,15 @@
-import { Body, Controller, Get, Param, Post, Put, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { AuthGuard } from '../auth/auth.jwt.guard';
+
 import { NftService } from './nft.service';
 import { CreateNftDTO } from './dto/createNft.dto';
 
@@ -9,7 +17,6 @@ import { CreateNftDTO } from './dto/createNft.dto';
 @Controller('/nfts')
 export class NftController {
   constructor(private nftService: NftService) {}
-
 
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
@@ -24,13 +31,11 @@ export class NftController {
   getAllCollections() {
     return this.nftService.getAllCollections();
   }
-//   @UseGuards(AuthGuard)
-//   @ApiBearerAuth()
-//   @Put('my-profile')
-//   @ApiOperation({ summary: 'Update the profile of current user' })
-//   updateMyInformation(@Request() req, @Body() data: updateUserProfileDTO) {
-//     return this.userService.updateUserProfile(req.user.id, data);
-//   }
-
-
+  //   @UseGuards(AuthGuard)
+  //   @ApiBearerAuth()
+  //   @Put('my-profile')
+  //   @ApiOperation({ summary: 'Update the profile of current user' })
+  //   updateMyInformation(@Request() req, @Body() data: updateUserProfileDTO) {
+  //     return this.userService.updateUserProfile(req.user.id, data);
+  //   }
 }

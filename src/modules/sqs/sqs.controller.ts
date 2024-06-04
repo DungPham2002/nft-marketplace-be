@@ -1,4 +1,5 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
+
 import { SQSService } from './sqs.service';
 
 @Controller()

@@ -1,8 +1,9 @@
 import { Prisma, User } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
+import { toChecksumAddress } from 'web3-utils';
 
 import { PrismaService } from '../prisma/prisma.service';
-import { toChecksumAddress } from 'web3-utils';
+
 import { updateUserProfileDTO } from './dto/updateUserProfile.dto';
 
 @Injectable()
@@ -44,11 +45,13 @@ export class UserService {
     });
   }
 
-
-  async updateUserProfile(userId: number, data: updateUserProfileDTO): Promise<User> {
+  async updateUserProfile(
+    userId: number,
+    data: updateUserProfileDTO,
+  ): Promise<User> {
     const user = await this.prisma.user.update({
-      where: {id: userId},
-      data: data
+      where: { id: userId },
+      data: data,
     });
     return user;
   }

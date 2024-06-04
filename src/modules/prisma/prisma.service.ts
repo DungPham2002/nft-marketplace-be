@@ -6,7 +6,8 @@ import { PRISMA_CLIENT_OPTIONS } from './prisma.config';
 @Injectable()
 export class PrismaService
   extends PrismaClient<Prisma.PrismaClientOptions, 'error' | 'query'>
-  implements OnModuleInit, OnModuleDestroy {
+  implements OnModuleInit, OnModuleDestroy
+{
   constructor() {
     super({ ...PRISMA_CLIENT_OPTIONS });
   }
@@ -17,7 +18,6 @@ export class PrismaService
     this.$on('error', (_e) => {
       // Do something
     });
-
   }
 
   async onModuleDestroy() {

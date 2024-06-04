@@ -1,7 +1,9 @@
+// const path = require('path')
+
 module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: path.join(__dirname, "tsconfig.eslint.json"),
+    // project: path.join(__dirname, 'tsconfig.eslint.json'),
     sourceType: 'module',
     tsconfigRootDir: __dirname,
   },
@@ -23,28 +25,32 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
 
-    "@typescript-eslint/no-unused-vars": "off",
-    "unused-imports/no-unused-imports": "error",
-    "unused-imports/no-unused-vars": [
-      "warn",
+    '@typescript-eslint/no-unused-vars': 'off',
+    'unused-imports/no-unused-imports': 'error',
+    'unused-imports/no-unused-vars': [
+      'warn',
       {
-        "vars": "all",
-        "varsIgnorePattern": "^_",
-        "args": "after-used",
-        "argsIgnorePattern": "^_",
-      }
+        vars: 'all',
+        varsIgnorePattern: '^_',
+        args: 'after-used',
+        argsIgnorePattern: '^_',
+      },
     ],
 
-    "import/order": [
-      "warn",
+    'import/order': [
+      'warn',
       {
-        "newlines-between": "always"
-      }
+        'newlines-between': 'always',
+      },
     ],
 
-    "padding-line-between-statements": [
-      "error",
-      { blankLine: "always", prev: ['var', 'const', 'function', 'class'], next: ['if', 'while', 'function'] }
-    ]
+    'padding-line-between-statements': [
+      'error',
+      {
+        blankLine: 'always',
+        prev: ['var', 'const', 'function', 'class'],
+        next: ['if', 'while', 'function'],
+      },
+    ],
   },
 };
