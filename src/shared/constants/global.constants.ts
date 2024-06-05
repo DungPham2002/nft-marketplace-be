@@ -18,7 +18,7 @@ export const MAX_PAGE_LIMIT = 100;
 
 export const DEFAULT_SORT_BY = 'id';
 
-export const API_PREFIX = '/api/v1';
+export const API_PREFIX = '';
 
 //Regex
 export const PHONE_REGEX = /^[0-9\s+-.()]+$/;
