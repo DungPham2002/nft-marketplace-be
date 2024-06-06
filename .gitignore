@@ -397,5 +397,3 @@ Temporary Items
 .env
 dist
 package-lock.json
-docker-compose.txt
-Dockerfile.txt
