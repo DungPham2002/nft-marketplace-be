@@ -53,8 +53,7 @@ async function bootstrap() {
     SwaggerModule.setup(swaggerConfig.path || 'api', app, document);
   }
 
-  // const port = process.env.PORT || GLOBAL_CONFIG.nest.port;
-  const port = process.env.PORT || 4000;
+  const port = process.env.PORT || GLOBAL_CONFIG.nest.port;
   await app.listen(port, async () => {
     const myLogger = await app.resolve(MyLogger);
     myLogger.log(`Server started listening: ${port}`);
