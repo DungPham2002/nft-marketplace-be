@@ -30,7 +30,7 @@ model Nft {
   name                String
   image               String
   website             String
-  price               Int
+  price               Float
   description         String
   royalties           Int
   size                String
