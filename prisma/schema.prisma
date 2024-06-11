@@ -15,7 +15,7 @@ model User {
   avatar              String
   email               String
   description         String
-  website             String
+  youtube             String
   facebook            String
   twitter             String
   instagram           String

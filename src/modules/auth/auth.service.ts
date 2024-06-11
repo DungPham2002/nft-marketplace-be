@@ -32,7 +32,7 @@ export class AuthService {
           avatar: '',
           email: '',
           description: '',
-          website: '',
+          youtube: '',
           facebook: '',
           twitter: '',
           instagram: '',

@@ -25,7 +25,7 @@ export class updateUserProfileDTO {
   @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
-  readonly website: string;
+  readonly youtube: string;
 
   @ApiProperty({ required: false })
   @IsString()
