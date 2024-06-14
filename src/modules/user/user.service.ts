@@ -40,10 +40,29 @@ export class UserService {
   }
 
   async getUserByAddress(address: string) {
-    return this.prisma.user.findFirst({
+    const user = await this.prisma.user.findFirst({
       where: { address: toChecksumAddress(address) },
     });
+    let listedNft = [];
+    let createdNft = [];
+
+    if (user) {
+      listedNft = await this.prisma.nft.findMany({
+        where: {
+          owner: user,
+          isSelling: true,
+        },
+      });
+      createdNft = await this.prisma.nft.findMany({
+        where: {
+          owner: user,
+          isSelling: false,
+        }
+      })
+    };
+    return { user, listedNft, createdNft };
   }
+
 
   async updateUserProfile(
     userId: number,
