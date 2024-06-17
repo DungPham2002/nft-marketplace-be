@@ -2,7 +2,9 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
+  Put,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -24,6 +26,22 @@ export class NftController {
   @ApiOperation({ summary: 'Create NFT' })
   getMyProfile(@Request() req, @Body() data: CreateNftDTO) {
     return this.nftService.createNft(req.user.id, data);
+  }
+
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @Put('buy-nft/:address/:tokenId')
+  @ApiOperation({ summary: 'Create NFT' })
+  buyNft(@Param('address') address: string, @Param('tokenId') tokenId: number) {
+    return this.nftService.buyNft(address, +tokenId);
+  }
+
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @Put('resell-nft/:tokenId/:price')
+  @ApiOperation({ summary: 'Resell NFT' })
+  reSellNft(@Param('tokenId') tokenId: number, @Param('price') price: number) {
+    return this.nftService.reSellNFT(+tokenId, +price);
   }
 
   @Get('collections')
