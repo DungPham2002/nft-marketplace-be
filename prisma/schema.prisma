@@ -9,8 +9,8 @@ datasource db {
 
 
 model User {
-  id                  Int     @id @default(autoincrement())
-  address             String  @unique
+  id                  Int                     @id @default(autoincrement())
+  address             String                  @unique
   name                String
   avatar              String
   email               String
@@ -19,7 +19,12 @@ model User {
   facebook            String
   twitter             String
   instagram           String
-  nftsOwned           Nft[]      @relation("NFTsOwned")
+  
+  
+  
+  nftsOwned           Nft[]                  @relation("NFTsOwned")
+  auctionSeller       Auction[]              @relation("AuctionSeller")
+  auctionBidder       AuctionBid[]           @relation("AuctionBidder")
   // nftsCreated         NFT[]      @relation("NFTsCreated")
 }
 
@@ -42,16 +47,48 @@ model Nft {
   
   owner               User       @relation("NFTsOwned", fields: [ownerId], references: [id])
   collection          Collection @relation(fields: [collectionId], references: [id])
+  auction             Auction[]  @relation("NFTAuction")
   // creator             User       @relation("NFTsCreated", fields: [creatorId], references: [id])
   
 }
 
+model Auction {
+  id                  Int                  @id @default(autoincrement())
+  nftId               Int
+  sellerId            Int
+  minBid              Float
+  duration            Float
+  isActive            Boolean
+  timeEnd             DateTime
+  created_at          DateTime             @default(now())
+  updated_at          DateTime             @default(now()) @updatedAt
+
+  seller              User                 @relation("AuctionSeller", fields: [sellerId], references: [id])
+  nft                 Nft                  @relation("NFTAuction", fields: [nftId], references: [tokenId])
+  bids                AuctionBid[]         @relation("AuctionBids")
+
+}
+
+model AuctionBid {
+  id                  Int                  @id @default(autoincrement())
+  auctionId           Int
+  bidderId            Int
+  bidAmount           Float
+  created_at          DateTime             @default(now())
+  updated_at          DateTime             @default(now()) @updatedAt
+
+  bidder              User                 @relation("AuctionBidder", fields: [bidderId], references: [id])
+  auction             Auction              @relation("AuctionBids", fields: [auctionId], references: [id])
+}
+
+
+
 
 model Collection {
-  id       Int     @id @default(autoincrement())
-  name     String
-  image    String
-  nfts     Nft[]
+  id                  Int                  @id @default(autoincrement())
+  name                String
+  image               String
+  nfts                Nft[]
 
   @@unique([name])
 }
