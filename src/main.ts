@@ -25,13 +25,7 @@ async function bootstrap() {
     new InvalidFormExceptionFilter(),
   );
 
-  app.use(
-    cors({
-      origin: process.env.FRONTEND_URL,
-      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-      credentials: true,
-    }),
-  );
+  app.enableCors();
 
   app.use(cookieParser());
 
