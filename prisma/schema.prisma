@@ -25,6 +25,7 @@ model User {
   nftsOwned           Nft[]                  @relation("NFTsOwned")
   auctionSeller       Auction[]              @relation("AuctionSeller")
   auctionBidder       AuctionBid[]           @relation("AuctionBidder")
+  userLikeNft         Nft_likes[]
   // nftsCreated         NFT[]      @relation("NFTsCreated")
 }
 
@@ -48,6 +49,7 @@ model Nft {
   owner               User       @relation("NFTsOwned", fields: [ownerId], references: [id])
   collection          Collection @relation(fields: [collectionId], references: [id])
   auction             Auction[]  @relation("NFTAuction")
+  nftLikes            Nft_likes[]
   // creator             User       @relation("NFTsCreated", fields: [creatorId], references: [id])
   
 }
@@ -79,6 +81,17 @@ model AuctionBid {
 
   bidder              User                 @relation("AuctionBidder", fields: [bidderId], references: [id])
   auction             Auction              @relation("AuctionBids", fields: [auctionId], references: [id])
+}
+
+model Nft_likes {
+  nftId               Int
+  userId              Int
+  created_at          DateTime             @default(now())
+  updated_at          DateTime             @default(now()) @updatedAt
+  nft                 Nft                  @relation(fields: [nftId], references: [tokenId])
+  user                User                 @relation(fields: [userId], references: [id])
+
+  @@id([nftId, userId])
 }
 
 

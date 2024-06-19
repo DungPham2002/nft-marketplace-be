@@ -156,4 +156,41 @@ export class NftService {
       console.log(error);
     }
   }
+
+  async likeNft(userId: number, tokenId: number) {
+    try {
+      await this.prisma.nft_likes.create({
+        data: {
+          userId,
+          nftId: +tokenId,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async unlikeNft(userId: number, tokenId: number) {
+    try {
+      await this.prisma.nft_likes.delete({
+        where: { nftId_userId: { nftId: +tokenId, userId: userId } },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getLikeNft(userId: number, tokenId: number) {
+    try {
+      const likeCount = await this.prisma.nft_likes.count({
+        where: { nftId: +tokenId },
+      });
+      const checkIsLiked = await this.prisma.nft_likes.findFirst({
+        where: { nftId: +tokenId, userId: +userId },
+      });
+      return { likeCount, isLiked: checkIsLiked ? true : false };
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }

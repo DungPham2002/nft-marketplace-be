@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -28,7 +29,6 @@ export class NftController {
   getMyProfile(@Request() req, @Body() data: CreateNftDTO) {
     return this.nftService.createNft(req.user.id, data);
   }
-
 
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
@@ -77,6 +77,31 @@ export class NftController {
     return this.nftService.endAuction(tokenId);
   }
 
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @Post('like-nft/:tokenId')
+  @ApiOperation({ summary: 'Like NFT' })
+  likeNft(@Request() req, @Param('tokenId') tokenId: number) {
+    return this.nftService.likeNft(req.user.id, tokenId);
+  }
+
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @Delete('unlike-nft/:tokenId')
+  @ApiOperation({ summary: 'UnLike NFT' })
+  unLikeNft(@Request() req, @Param('tokenId') tokenId: number) {
+    return this.nftService.unlikeNft(req.user.id, tokenId);
+  }
+
+  @ApiBearerAuth()
+  @Post('nft-like-count/:userId/:tokenId')
+  @ApiOperation({ summary: 'Get likes of Nft' })
+  getLikeNft(
+    @Param('userId') userId: number,
+    @Param('tokenId') tokenId: number,
+  ) {
+    return this.nftService.getLikeNft(userId, tokenId);
+  }
 
   @Get('collections')
   @ApiOperation({ summary: 'Get All Collections' })
