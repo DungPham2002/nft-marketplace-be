@@ -6,6 +6,7 @@ import { PrismaService } from '../prisma/prisma.service';
 
 import { CreateNftDTO } from './dto/createNft.dto';
 import { CreateAuctionDTO } from './dto/createAuction.dto';
+import e from 'express';
 
 @Injectable()
 export class NftService {
@@ -191,6 +192,57 @@ export class NftService {
       return { likeCount, isLiked: checkIsLiked ? true : false };
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  async getListNftLiked(address: string) {
+    try {
+      const user = await this.prisma.user.findFirst({
+        where: { address: address },
+      })
+      const listLiked = await this.prisma.nft_likes.findMany({
+        where: { userId: user.id },
+        select: {
+          nft: true,
+        }
+      });
+      return listLiked.map((item) => item.nft);
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  async getListSoldNftByAddress(address: string) {
+    try {
+      const user = await this.prisma.user.findFirst({
+        where: { address: address },
+      });
+      const listSoldNft = await this.prisma.nft.findMany({
+        where: {
+          ownerId: user.id,
+          isSelling: true,
+        },
+      })
+      return listSoldNft;
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  async getListOwnerNftByAddress(address: string) {
+    try {
+      const user = await this.prisma.user.findFirst({
+        where: { address: address },
+      })
+      const listOwnerNft = await this.prisma.nft.findMany({
+        where: {
+          ownerId: user.id,
+          isSelling: false,
+        }
+      })
+      return listOwnerNft;
+    } catch (error) {
+      console.log(error)
     }
   }
 }

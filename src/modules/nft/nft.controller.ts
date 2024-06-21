@@ -103,6 +103,27 @@ export class NftController {
     return this.nftService.getLikeNft(userId, tokenId);
   }
 
+  @ApiBearerAuth()
+  @Get('liked-list/:address')
+  @ApiOperation({ summary: 'Get Nft liked list' })
+  getListNftLiked(@Param('address') address: string) {
+    return this.nftService.getListNftLiked(address);
+  }
+
+  @ApiBearerAuth()
+  @Get('sell-list/:address')
+  @ApiOperation({ summary: 'Get Nft sold list' })
+  getListSoldNft(@Param('address') address: string) {
+    return this.nftService.getListSoldNftByAddress(address);
+  }
+
+  @ApiBearerAuth()
+  @Get('own-list/:address')
+  @ApiOperation({ summary: 'Get Nft owner list' })
+  getListOwnerNft(@Param('address') address: string) {
+    return this.nftService.getListOwnerNftByAddress(address);
+  }
+
   @Get('collections')
   @ApiOperation({ summary: 'Get All Collections' })
   getAllCollections() {
