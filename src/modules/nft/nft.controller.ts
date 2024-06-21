@@ -15,7 +15,6 @@ import { AuthGuard } from '../auth/auth.jwt.guard';
 
 import { NftService } from './nft.service';
 import { CreateNftDTO } from './dto/createNft.dto';
-import { CreateAuctionDTO } from './dto/createAuction.dto';
 
 @ApiTags('nfts')
 @Controller('/nfts')
@@ -30,17 +29,6 @@ export class NftController {
     return this.nftService.createNft(req.user.id, data);
   }
 
-  @UseGuards(AuthGuard)
-  @ApiBearerAuth()
-  @Post('create-auction/:nftId')
-  @ApiOperation({ summary: 'Create Auction' })
-  createAuction(
-    @Request() req,
-    @Param('nftId') nftId: number,
-    @Body() data: CreateAuctionDTO,
-  ) {
-    return this.nftService.createAuction(req.user.id, nftId, data);
-  }
 
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
@@ -58,24 +46,6 @@ export class NftController {
     return this.nftService.reSellNFT(+tokenId, +price);
   }
 
-  @UseGuards(AuthGuard)
-  @ApiBearerAuth()
-  @Post('bid-auction/:tokenId')
-  @ApiOperation({ summary: 'Make an offer' })
-  bidAuction(
-    @Request() req,
-    @Param('tokenId') tokenId: number,
-    @Body() dto: any,
-  ) {
-    return this.nftService.bidAuction(req.user.id, tokenId, dto.price);
-  }
-
-  @ApiBearerAuth()
-  @Post('end-auction/:tokenId')
-  @ApiOperation({ summary: 'End auction' })
-  endAuction(@Param('tokenId') tokenId: number) {
-    return this.nftService.endAuction(tokenId);
-  }
 
   @UseGuards(AuthGuard)
   @ApiBearerAuth()

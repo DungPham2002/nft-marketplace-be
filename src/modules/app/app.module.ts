@@ -12,6 +12,7 @@ import { NftModule } from '../nft/nft.module';
 
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
+import { AuctionModule } from '../auction/auction.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AppController } from './app.controller';
     AuthModule,
     UserModule,
     NftModule,
+    AuctionModule,
     ConfigModule.forRoot({ isGlobal: true, load: [() => GLOBAL_CONFIG] }),
   ],
   controllers: [AppController],

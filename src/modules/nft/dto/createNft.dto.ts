@@ -33,4 +33,8 @@ export class CreateNftDTO {
   @ApiProperty({ required: false })
   @IsNotEmpty()
   collectionId: number;
+
+  @ApiProperty({ required: false })
+  @IsNotEmpty()
+  tokenURI: string;
 }
