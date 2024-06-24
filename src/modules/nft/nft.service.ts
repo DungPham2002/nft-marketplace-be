@@ -6,8 +6,6 @@ import { PrismaService } from '../prisma/prisma.service';
 
 import { CreateNftDTO } from './dto/createNft.dto';
 
-
-
 @Injectable()
 export class NftService {
   constructor(private prisma: PrismaService) {}
@@ -104,16 +102,16 @@ export class NftService {
     try {
       const user = await this.prisma.user.findFirst({
         where: { address: address },
-      })
+      });
       const listLiked = await this.prisma.nft_likes.findMany({
         where: { userId: user.id },
         select: {
           nft: true,
-        }
+        },
       });
       return listLiked.map((item) => item.nft);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
 
@@ -139,15 +137,15 @@ export class NftService {
           royalties: true,
           owner: {
             select: {
-              address: true
-            }
+              address: true,
+            },
           },
           tokenURI: true,
-        }
-      })
+        },
+      });
       return listSoldNft;
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
 
@@ -155,7 +153,7 @@ export class NftService {
     try {
       const user = await this.prisma.user.findFirst({
         where: { address: address },
-      })
+      });
       const listOwnerNft = await this.prisma.nft.findMany({
         where: {
           ownerId: user.id,
@@ -173,15 +171,70 @@ export class NftService {
           royalties: true,
           owner: {
             select: {
-              address: true
-            }
+              address: true,
+            },
           },
           tokenURI: true,
-        }
-      })
+        },
+      });
       return listOwnerNft;
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
+
+  async getTopNft() {
+    try {
+      const topNfts = await this.prisma.nft.findMany({
+        where: {
+          isSelling: true,
+        },
+        select: {
+          tokenId: true,
+          name: true,
+          description: true,
+          image: true,
+          price: true,
+          isSelling: true,
+          collectionId: true,
+          website: true,
+          royalties: true,
+          owner: {
+            select: {
+              address: true,
+            },
+          },
+          tokenURI: true,
+          _count: {
+            select: { nftLikes: true },
+          },
+        },
+        orderBy: {
+          nftLikes: {
+            _count: 'desc',
+          },
+        },
+        take: 10,
+      });
+      const formattedTopNfts = topNfts.map((nft) => ({
+        tokenId: nft.tokenId,
+        name: nft.name,
+        description: nft.description,
+        image: nft.image,
+        price: nft.price,
+        isSelling: nft.isSelling,
+        collectionId: nft.collectionId,
+        website: nft.website,
+        royalties: nft.royalties,
+        seller: nft.owner.address,
+        tokenURI: nft.tokenURI,
+    }));
+
+    return formattedTopNfts;
+    } catch (error) {
+      console.log(error);
+      throw new Error('Failed to fetch top NFTs');
+    }
+  }
+  
 }

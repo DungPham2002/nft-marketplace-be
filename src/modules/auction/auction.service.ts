@@ -4,7 +4,6 @@ import { PrismaService } from '../prisma/prisma.service';
 
 import { CreateAuctionDTO } from './dto/createAuction.dto';
 
-
 @Injectable()
 export class AuctionService {
   constructor(private prisma: PrismaService) {}
@@ -27,7 +26,7 @@ export class AuctionService {
         return 'Auction already active';
       }
 
-      const timeEnd = new Date(new Date().getTime() + data.duration);
+      const timeEnd = new Date(new Date().getTime() + data.duration * 1000);
 
       await this.prisma.auction.create({
         data: {
@@ -91,17 +90,98 @@ export class AuctionService {
         orderBy: { bidAmount: 'desc' },
       });
 
-      if (higgestBidder) {
-        await this.prisma.nft.update({
-          where: { tokenId: +nftId },
-          data: {
-            ownerId: higgestBidder.bidderId,
-            price: higgestBidder.bidAmount,
-          },
-        });
+      if (!higgestBidder) {
+        return 'No one bids';
       }
+      await this.prisma.nft.update({
+        where: { tokenId: +nftId },
+        data: {
+          ownerId: higgestBidder.bidderId,
+          price: higgestBidder.bidAmount,
+        },
+      });
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  async getTopAuction() {
+    try {
+      const topAuctions = await this.prisma.auction.findMany({
+        where: {
+          isActive: true,
+        },
+        include: {
+          nft: {
+            include: {
+              collection: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+          seller: {
+            select: {
+              address: true,
+              name: true,
+              avatar: true,
+            },
+          },
+          _count: {
+            select: { bids: true },
+          },
+          bids: {
+            select: {
+              bidAmount: true,
+              bidder: {
+                select: {
+                  address: true,
+                },
+              },
+            },
+            orderBy: {
+              bidAmount: 'desc',
+            },
+          },
+        },
+        orderBy: {
+          bids: {
+            _count: 'desc',
+          },
+        },
+        take: 10,
+      });
+
+      const formattedAuctions = topAuctions.map((auction) => {
+        const highestBid =
+          auction.bids.length > 0 ? auction.bids[0].bidAmount : 0.0;
+        const highestBidder =
+          auction.bids.length > 0
+            ? auction.bids[0].bidder.address
+            : '0x0000000000000000000000000000000000000000';
+
+        return {
+          tokenId: auction.nft.tokenId,
+          seller: auction.seller.address,
+          sellerName: auction.seller.name,
+          sellerAvatar: auction.seller.avatar,
+          image: auction.nft.image,
+          name: auction.nft.name,
+          description: auction.nft.description,
+          minBid: auction.minBid.toString(),
+          highestBid: highestBid.toString(),
+          highestBidder: highestBidder,
+          tokenURI: auction.nft.tokenURI,
+          collectionName: auction.nft.collection.name,
+          endTime: auction.timeEnd.toISOString(),
+        };
+      });
+
+      return formattedAuctions;
+    } catch (error) {
+      console.log(error);
+      throw new Error('Failed to fetch top auctions');
     }
   }
 }

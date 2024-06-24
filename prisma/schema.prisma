@@ -46,14 +46,12 @@ model Nft {
   tokenURI            String
   created_at          DateTime  @default(now())
   updated_at          DateTime  @default(now()) @updatedAt
-  // creatorId           Int
   
   
   owner               User       @relation("NFTsOwned", fields: [ownerId], references: [id])
   collection          Collection @relation(fields: [collectionId], references: [id])
   auction             Auction[]  @relation("NFTAuction")
   nftLikes            Nft_likes[]
-  // creator             User       @relation("NFTsCreated", fields: [creatorId], references: [id])
   
 }
 

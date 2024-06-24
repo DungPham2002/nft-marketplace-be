@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Param,
   Post,
   Request,
@@ -47,6 +48,13 @@ export class AuctionController {
   @ApiOperation({ summary: 'End auction' })
   endAuction(@Param('tokenId') tokenId: number) {
     return this.auctionService.endAuction(tokenId);
+  }
+
+  @ApiBearerAuth()
+  @Get('top-auction')
+  @ApiOperation({ summary: 'Get top auction' })
+  getTopAuction() {
+    return this.auctionService.getTopAuction();
   }
 
 }

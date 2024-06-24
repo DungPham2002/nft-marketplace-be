@@ -94,6 +94,13 @@ export class NftController {
     return this.nftService.getListOwnerNftByAddress(address);
   }
 
+  @ApiBearerAuth()
+  @Get('top-nft')
+  @ApiOperation({ summary: 'Get top nft' })
+  getTopNft() {
+    return this.nftService.getTopNft();
+  }
+
   @Get('collections')
   @ApiOperation({ summary: 'Get All Collections' })
   getAllCollections() {
