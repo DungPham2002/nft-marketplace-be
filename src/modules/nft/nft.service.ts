@@ -5,6 +5,7 @@ import { toChecksumAddress } from 'web3-utils';
 import { PrismaService } from '../prisma/prisma.service';
 
 import { CreateNftDTO } from './dto/createNft.dto';
+import { FilterNftDTO } from './dto/filterNft.dto';
 
 @Injectable()
 export class NftService {
@@ -208,6 +209,7 @@ export class NftService {
           _count: {
             select: { nftLikes: true },
           },
+          collection: true,
         },
         orderBy: {
           nftLikes: {
@@ -228,13 +230,51 @@ export class NftService {
         royalties: nft.royalties,
         seller: nft.owner.address,
         tokenURI: nft.tokenURI,
-    }));
+        collectionName: nft.collection.name,
+        collectionImage: nft.collection.image,
+      }));
 
-    return formattedTopNfts;
+      return formattedTopNfts;
     } catch (error) {
       console.log(error);
       throw new Error('Failed to fetch top NFTs');
     }
   }
-  
+
+  async getFilteredNft(data: FilterNftDTO) {
+    try {
+      const { collectionId, filter } = data;
+      const whereClause = collectionId
+        ? { collectionId: +collectionId, isSelling: true }
+        : { isSelling: true };
+      let orderByClause = {};
+      if (filter) {
+        switch (filter) {
+          case 'highest':
+            orderByClause = { price: 'desc' };
+            break;
+          case 'lowest':
+            orderByClause = { price: 'asc' };
+            break;
+          case 'newest':
+            orderByClause = { created_at: 'desc' };
+            break;
+          case 'oldest':
+            orderByClause = { created_at: 'asc' };
+            break;
+          default:
+            break;
+        }
+      }
+      return await this.prisma.nft.findMany({
+        where: whereClause,
+        orderBy: orderByClause,
+        include: {
+          collection: true,
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }

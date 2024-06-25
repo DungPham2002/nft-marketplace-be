@@ -4,15 +4,18 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { AuthGuard } from '../auth/auth.jwt.guard';
+import { FilterNftDTO } from '../nft/dto/filterNft.dto';
 
 import { CreateAuctionDTO } from './dto/createAuction.dto';
 import { AuctionService } from './auction.service';
+
 
 @ApiTags('auction')
 @Controller('/auction')
@@ -55,6 +58,13 @@ export class AuctionController {
   @ApiOperation({ summary: 'Get top auction' })
   getTopAuction() {
     return this.auctionService.getTopAuction();
+  }
+
+  @ApiBearerAuth()
+  @Get('filter-auction')
+  @ApiOperation({ summary: 'Get filtered auction' })
+  getFilteredNft(@Query() data: FilterNftDTO) {
+    return this.auctionService.getFilteredAuction(data);
   }
 
 }

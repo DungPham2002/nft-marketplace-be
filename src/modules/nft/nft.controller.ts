@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -15,6 +16,7 @@ import { AuthGuard } from '../auth/auth.jwt.guard';
 
 import { NftService } from './nft.service';
 import { CreateNftDTO } from './dto/createNft.dto';
+import { FilterNftDTO } from './dto/filterNft.dto';
 
 @ApiTags('nfts')
 @Controller('/nfts')
@@ -99,6 +101,13 @@ export class NftController {
   @ApiOperation({ summary: 'Get top nft' })
   getTopNft() {
     return this.nftService.getTopNft();
+  }
+
+  @ApiBearerAuth()
+  @Get('filter-nft')
+  @ApiOperation({ summary: 'Get filtered nft' })
+  getFilteredNft(@Query() filterNftDTO: FilterNftDTO) {
+    return this.nftService.getFilteredNft(filterNftDTO);
   }
 
   @Get('collections')

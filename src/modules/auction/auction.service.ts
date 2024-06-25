@@ -3,6 +3,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 import { CreateAuctionDTO } from './dto/createAuction.dto';
+import { FilterNftDTO } from '../nft/dto/filterNft.dto';
 
 @Injectable()
 export class AuctionService {
@@ -114,11 +115,7 @@ export class AuctionService {
         include: {
           nft: {
             include: {
-              collection: {
-                select: {
-                  name: true,
-                },
-              },
+              collection: true,
             },
           },
           seller: {
@@ -174,6 +171,7 @@ export class AuctionService {
           highestBidder: highestBidder,
           tokenURI: auction.nft.tokenURI,
           collectionName: auction.nft.collection.name,
+          collectionImage: auction.nft.collection.image,
           endTime: auction.timeEnd.toISOString(),
         };
       });
@@ -182,6 +180,90 @@ export class AuctionService {
     } catch (error) {
       console.log(error);
       throw new Error('Failed to fetch top auctions');
+    }
+  }
+
+  async getFilteredAuction(data: FilterNftDTO) {
+    try {
+      const { collectionId, filter } = data;
+      const whereClause = collectionId
+        ? { nft: { collectionId: +collectionId }, isActive: true }
+        : { isActive: true };
+      let orderByClause = {};
+      if (filter) {
+        switch (filter) {
+          case 'highest':
+            orderByClause = { highestBid: 'desc' };
+            break;
+          case 'lowest':
+            orderByClause = { highestBid: 'asc' };
+            break;
+          case 'newest':
+            orderByClause = { created_at: 'desc' };
+            break;
+          case 'oldest':
+            orderByClause = { created_at: 'asc' };
+            break;
+          default:
+            break;
+        }
+      }
+      const auctions = await this.prisma.auction.findMany({
+        where: whereClause,
+        orderBy: orderByClause,
+        include: {
+          nft: {
+            include: {
+              collection: true,
+            },
+          },
+          seller: {
+            select: {
+              address: true,
+              name: true,
+              avatar: true,
+            },
+          },
+          bids: {
+            select: {
+              bidAmount: true,
+              bidder: {
+                select: {
+                  address: true,
+                },
+              },
+            },
+          },
+        },
+      });
+      const formattedAuctions = auctions.map((auction) => {
+        const highestBid =
+          auction.bids.length > 0 ? auction.bids[0].bidAmount : 0.0;
+        const highestBidder =
+          auction.bids.length > 0
+            ? auction.bids[0].bidder.address
+            : '0x0000000000000000000000000000000000000000';
+
+        return {
+          tokenId: auction.nft.tokenId,
+          seller: auction.seller.address,
+          sellerName: auction.seller.name,
+          sellerAvatar: auction.seller.avatar,
+          image: auction.nft.image,
+          name: auction.nft.name,
+          description: auction.nft.description,
+          minBid: auction.minBid.toString(),
+          highestBid: highestBid.toString(),
+          highestBidder: highestBidder,
+          tokenURI: auction.nft.tokenURI,
+          collection: auction.nft.collection,
+          endTime: auction.timeEnd.toISOString(),
+        };
+      });
+
+      return formattedAuctions;
+    } catch (error) {
+      console.log(error);
     }
   }
 }
