@@ -28,8 +28,8 @@ model User {
   userLikeNft         Nft_likes[]
   followed            Follow[]               @relation("Followed")
   follower            Follow[]               @relation("Follower")
-  ownerHistory        OwnerHistory[]         @relation("NftOwnerHistory")
-  bidderHistory       BidderHistory[]        @relation("AuctionBidderHistory")
+  ownerHistory        OwnerHistory[]         @relation("OwnerHistory")
+  bidderHistory       BidderHistory[]        @relation("BidderHistory")
 }
 
 model Nft {
@@ -53,7 +53,7 @@ model Nft {
   collection          Collection       @relation(fields: [collectionId], references: [id])
   auction             Auction[]        @relation("NFTAuction")
   nftLikes            Nft_likes[]
-  ownerHistory        OwnerHistory[]   @relation("OwnerHistory")
+  ownerHistory        OwnerHistory[]   @relation("NftOwnerHistory")
   
 }
 
@@ -130,8 +130,8 @@ model OwnerHistory {
   ownerId             Int
   created_at          DateTime             @default(now())
   updated_at          DateTime             @default(now()) @updatedAt
-  nft                 Nft                  @relation("OwnerHistory", fields: [nftId], references: [tokenId])
-  owner               User                 @relation("NftOwnerHistory", fields: [ownerId], references: [id])
+  nft                 Nft                  @relation("NftOwnerHistory", fields: [nftId], references: [tokenId])
+  owner               User                 @relation("OwnerHistory", fields: [ownerId], references: [id])
 }
 
 model BidderHistory {
@@ -142,5 +142,5 @@ model BidderHistory {
   created_at          DateTime             @default(now())
   updated_at          DateTime             @default(now()) @updatedAt
   auction             Auction              @relation("AuctionBidderHistory", fields: [auctionId], references: [id])
-  bidder              User                 @relation("AuctionBidderHistory", fields: [bidderId], references: [id])
+  bidder              User                 @relation("BidderHistory", fields: [bidderId], references: [id])
 }
