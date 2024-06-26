@@ -53,7 +53,7 @@ model Nft {
   collection          Collection       @relation(fields: [collectionId], references: [id])
   auction             Auction[]        @relation("NFTAuction")
   nftLikes            Nft_likes[]
-  ownerHistory        OwnerHistory[]   @relation("NftOwnerHistory")
+  ownerHistory        OwnerHistory[]   @relation("OwnerHistory")
   
 }
 
@@ -130,7 +130,7 @@ model OwnerHistory {
   ownerId             Int
   created_at          DateTime             @default(now())
   updated_at          DateTime             @default(now()) @updatedAt
-  nft                 Nft                  @relation("NftOwnerHistory", fields: [nftId], references: [tokenId])
+  nft                 Nft                  @relation("OwnerHistory", fields: [nftId], references: [tokenId])
   owner               User                 @relation("NftOwnerHistory", fields: [ownerId], references: [id])
 }
 
