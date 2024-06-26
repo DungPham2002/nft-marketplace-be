@@ -28,7 +28,8 @@ model User {
   userLikeNft         Nft_likes[]
   followed            Follow[]               @relation("Followed")
   follower            Follow[]               @relation("Follower")
-  // nftsCreated         NFT[]      @relation("NFTsCreated")
+  ownerHistory        OwnerHistory[]         @relation("NftOwnerHistory")
+  bidderHistory       BidderHistory[]        @relation("AuctionBidderHistory")
 }
 
 model Nft {
@@ -44,14 +45,15 @@ model Nft {
   size                String
   isSelling           Boolean
   tokenURI            String
-  created_at          DateTime  @default(now())
-  updated_at          DateTime  @default(now()) @updatedAt
+  created_at          DateTime         @default(now())
+  updated_at          DateTime         @default(now()) @updatedAt
   
   
-  owner               User       @relation("NFTsOwned", fields: [ownerId], references: [id])
-  collection          Collection @relation(fields: [collectionId], references: [id])
-  auction             Auction[]  @relation("NFTAuction")
+  owner               User             @relation("NFTsOwned", fields: [ownerId], references: [id])
+  collection          Collection       @relation(fields: [collectionId], references: [id])
+  auction             Auction[]        @relation("NFTAuction")
   nftLikes            Nft_likes[]
+  ownerHistory        OwnerHistory[]   @relation("NftOwnerHistory")
   
 }
 
@@ -69,6 +71,7 @@ model Auction {
   seller              User                 @relation("AuctionSeller", fields: [sellerId], references: [id])
   nft                 Nft                  @relation("NFTAuction", fields: [nftId], references: [tokenId])
   bids                AuctionBid[]         @relation("AuctionBids")
+  bidderHistory       BidderHistory[]      @relation("AuctionBidderHistory")
 
 }
 
@@ -119,4 +122,25 @@ model Follow {
   follower            User                 @relation("Follower", fields: [followerId], references: [id])
 
   @@id([followedId, followerId])
+}
+
+model OwnerHistory {
+  id                  Int                  @id @default(autoincrement())
+  nftId               Int
+  ownerId             Int
+  created_at          DateTime             @default(now())
+  updated_at          DateTime             @default(now()) @updatedAt
+  nft                 Nft                  @relation("NftOwnerHistory", fields: [nftId], references: [tokenId])
+  owner               User                 @relation("NftOwnerHistory", fields: [ownerId], references: [id])
+}
+
+model BidderHistory {
+  id                  Int                  @id @default(autoincrement())
+  auctionId           Int
+  bidderId            Int
+  price               Int
+  created_at          DateTime             @default(now())
+  updated_at          DateTime             @default(now()) @updatedAt
+  auction             Auction              @relation("AuctionBidderHistory", fields: [auctionId], references: [id])
+  bidder              User                 @relation("AuctionBidderHistory", fields: [bidderId], references: [id])
 }

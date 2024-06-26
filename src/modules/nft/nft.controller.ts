@@ -110,6 +110,13 @@ export class NftController {
     return this.nftService.getFilteredNft(filterNftDTO);
   }
 
+  @ApiBearerAuth()
+  @Get('owner-history/:nftId')
+  @ApiOperation({ summary: 'Get history owner' })
+  getOwnerHistory(@Param('nftId') nftId: number) {
+    return this.nftService.getOwnerHistory(nftId);
+  }
+
   @Get('collections')
   @ApiOperation({ summary: 'Get All Collections' })
   getAllCollections() {

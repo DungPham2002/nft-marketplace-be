@@ -67,4 +67,11 @@ export class AuctionController {
     return this.auctionService.getFilteredAuction(data);
   }
 
+  @ApiBearerAuth()
+  @Get('bidder-history/:nftId')
+  @ApiOperation({ summary: 'Get bidder history' })
+  getBidderHistory(@Param('nftId') nftId: number) {
+    return this.auctionService.getBidderHistory(nftId);
+  }
+
 }

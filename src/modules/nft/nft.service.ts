@@ -27,6 +27,12 @@ export class NftService {
         isSelling: true,
       },
     });
+    await this.prisma.ownerHistory.create({
+      data: {
+        ownerId: ownerId,
+        nftId: nft.tokenId,
+      },
+    });
     return nft;
   }
 
@@ -43,6 +49,12 @@ export class NftService {
       await this.prisma.nft.update({
         where: { tokenId: tokenId },
         data: { ownerId: user.id, isSelling: false },
+      });
+      await this.prisma.ownerHistory.create({
+        data: {
+          ownerId: user.id,
+          nftId: tokenId,
+        },
       });
       return 'Buy Success';
     } catch (error) {
@@ -271,10 +283,19 @@ export class NftService {
         orderBy: orderByClause,
         include: {
           collection: true,
-        }
+          owner: true,
+        },
       });
     } catch (error) {
       console.log(error);
     }
+  }
+
+  async getOwnerHistory(nftId: number): Promise<any> {
+    return this.prisma.ownerHistory.findMany({
+      where: { nftId: +nftId },
+      include: { owner: true },
+      orderBy: { created_at: 'desc' }
+    });
   }
 }

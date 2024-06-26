@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { FilterNftDTO } from '../nft/dto/filterNft.dto';
 
 import { CreateAuctionDTO } from './dto/createAuction.dto';
-import { FilterNftDTO } from '../nft/dto/filterNft.dto';
 
 @Injectable()
 export class AuctionService {
@@ -63,6 +63,13 @@ export class AuctionService {
           auctionId: auction.id,
           bidderId: userId,
           bidAmount: +price,
+        },
+      });
+      await this.prisma.bidderHistory.create({
+        data: {
+          bidderId: +userId,
+          price: +price,
+          auctionId: auction.id,
         },
       });
       return 'Make an offer success';
@@ -193,10 +200,10 @@ export class AuctionService {
       if (filter) {
         switch (filter) {
           case 'highest':
-            orderByClause = { highestBid: 'desc' };
+            orderByClause = { minBid: 'desc' };
             break;
           case 'lowest':
-            orderByClause = { highestBid: 'asc' };
+            orderByClause = { minBid: 'asc' };
             break;
           case 'newest':
             orderByClause = { created_at: 'desc' };
@@ -233,6 +240,9 @@ export class AuctionService {
                 },
               },
             },
+            orderBy : {
+              bidAmount: 'desc',
+            }
           },
         },
       });
@@ -246,9 +256,7 @@ export class AuctionService {
 
         return {
           tokenId: auction.nft.tokenId,
-          seller: auction.seller.address,
-          sellerName: auction.seller.name,
-          sellerAvatar: auction.seller.avatar,
+          owner: auction.seller,
           image: auction.nft.image,
           name: auction.nft.name,
           description: auction.nft.description,
@@ -258,12 +266,31 @@ export class AuctionService {
           tokenURI: auction.nft.tokenURI,
           collection: auction.nft.collection,
           endTime: auction.timeEnd.toISOString(),
+          isActive: true,
         };
       });
-
+      console.log(formattedAuctions)
       return formattedAuctions;
     } catch (error) {
       console.log(error);
     }
+  }
+
+  async getBidderHistory(nftId: number): Promise<any> {
+    const auction = await this.prisma.auction.findFirst({
+      where: { nftId: +nftId, isActive: true },
+    });
+
+    if (!auction) {
+      return [];
+    }
+    if (auction.isActive == true) {
+      return this.prisma.bidderHistory.findMany({
+        where: { auctionId: auction.id },
+        include: { bidder: true },
+        orderBy: { created_at: 'desc' },
+      });
+    }
+    return [];
   }
 }
