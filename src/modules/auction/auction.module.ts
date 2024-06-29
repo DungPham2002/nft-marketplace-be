@@ -6,11 +6,12 @@ import { PrismaModule } from '../prisma/prisma.module';
 
 import { AuctionController } from './auction.controller';
 import { AuctionService } from './auction.service';
+import { NotificationGateway } from '../notification/notification.gateway';
 
 @Module({
   imports: [JwtModule, PrismaModule],
   controllers: [AuctionController],
-  providers: [AuctionService, PrismaService],
+  providers: [AuctionService, PrismaService, NotificationGateway],
   exports: [AuctionService],
 })
 export class AuctionModule {}

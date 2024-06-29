@@ -4,10 +4,15 @@ import { PrismaService } from '../prisma/prisma.service';
 import { FilterNftDTO } from '../nft/dto/filterNft.dto';
 
 import { CreateAuctionDTO } from './dto/createAuction.dto';
+import { NotificationGateway } from '../notification/notification.gateway';
+
 
 @Injectable()
 export class AuctionService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly notificationGateway: NotificationGateway,
+  ) {}
 
   async createAuction(userId: number, nftId: number, data: CreateAuctionDTO) {
     try {
@@ -38,6 +43,30 @@ export class AuctionService {
           isActive: true,
           timeEnd: timeEnd,
         },
+      });
+
+      const owner = await this.prisma.user.findFirst({
+        where: {
+          id: nft.ownerId,
+        },
+      });
+      const followers = await this.prisma.follow.findMany({
+        where: {
+          followedId: owner.id,
+        },
+        include: {
+          follower: true,
+        },
+      });
+      followers.forEach((follower) => {
+        this.notificationGateway.notifyUser(follower.follower.address, {
+          type: 'SELL',
+          avatar: owner.avatar,
+          address: owner.address,
+          image: nft.image,
+          message: 'Just sold an nft',
+          isRead: false
+        });
       });
       return 'Create Auction success';
     } catch (error) {
@@ -71,6 +100,23 @@ export class AuctionService {
           price: +price,
           auctionId: auction.id,
         },
+      });
+      const user = await this.prisma.user.findFirst({
+        where: { id: +userId },
+      });
+      const nft = await this.prisma.nft.findFirst({
+        where: { tokenId: +nftId },
+      });
+      const owner = await this.prisma.user.findFirst({
+        where: { id: +auction.sellerId },
+      });
+      await this.notificationGateway.notifyUser(owner.address, {
+        type: 'AUCTION',
+        avatar: user.avatar,
+        address: owner.address,
+        image: nft.image,
+        message: `Bid your NFT`,
+        isRead: false
       });
       return 'Make an offer success';
     } catch (error) {
@@ -240,9 +286,9 @@ export class AuctionService {
                 },
               },
             },
-            orderBy : {
+            orderBy: {
               bidAmount: 'desc',
-            }
+            },
           },
         },
       });
@@ -269,7 +315,6 @@ export class AuctionService {
           isActive: true,
         };
       });
-      console.log(formattedAuctions)
       return formattedAuctions;
     } catch (error) {
       console.log(error);

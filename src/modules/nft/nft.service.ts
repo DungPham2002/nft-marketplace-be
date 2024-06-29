@@ -3,13 +3,17 @@ import { Nft } from '@prisma/client';
 import { toChecksumAddress } from 'web3-utils';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificationGateway } from '../notification/notification.gateway';
 
 import { CreateNftDTO } from './dto/createNft.dto';
 import { FilterNftDTO } from './dto/filterNft.dto';
 
 @Injectable()
 export class NftService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly notificationGateway: NotificationGateway,
+  ) {}
 
   async createNft(ownerId: number, data: CreateNftDTO): Promise<Nft> {
     const nft = await this.prisma.nft.create({
@@ -27,11 +31,34 @@ export class NftService {
         isSelling: true,
       },
     });
+    const followers = await this.prisma.follow.findMany({
+      where: {
+        followedId: ownerId,
+      },
+      include: {
+        follower: true,
+      },
+    });
+    const owner = await this.prisma.user.findFirst({
+      where: {
+        id: ownerId,
+      },
+    });
     await this.prisma.ownerHistory.create({
       data: {
         ownerId: ownerId,
         nftId: nft.tokenId,
       },
+    });
+    followers.forEach((follower) => {
+      this.notificationGateway.notifyUser(follower.follower.address, {
+        type: 'SELL',
+        avatar: owner.avatar,
+        address: owner.address,
+        image: nft.image,
+        message: 'Just sold an nft',
+        isRead: false,
+      });
     });
     return nft;
   }
@@ -45,6 +72,20 @@ export class NftService {
     try {
       const user = await this.prisma.user.findFirst({
         where: { address: toChecksumAddress(address) },
+      });
+      const nft = await this.prisma.nft.findFirst({
+        where: { tokenId: tokenId },
+      });
+      const owner = await this.prisma.user.findFirst({
+        where: { id: nft.ownerId },
+      });
+      await this.notificationGateway.notifyUser(owner.address, {
+        type: 'BUY',
+        avatar: user.avatar,
+        address: address,
+        image: nft.image,
+        message: `Bought your NFT`,
+        isRead: false
       });
       await this.prisma.nft.update({
         where: { tokenId: tokenId },
@@ -68,6 +109,32 @@ export class NftService {
         where: { tokenId: tokenId },
         data: { isSelling: true, price: price },
       });
+      const nft = await this.prisma.nft.findFirst({
+        where: {
+          tokenId: tokenId,
+        },
+      });
+      const owner = await this.prisma.user.findFirst({
+        where: { id: nft.ownerId },
+      });
+      const followers = await this.prisma.follow.findMany({
+        where: {
+          followedId: owner.id,
+        },
+        include: {
+          follower: true,
+        },
+      });
+      followers.forEach((follower) => {
+        this.notificationGateway.notifyUser(follower.follower.address, {
+          type: 'SELL',
+          avatar: owner.avatar,
+          address: owner.address,
+          image: nft.image,
+          message: 'Just sold an nft',
+          isRead: false,
+        });
+      });
       return 'Resell success';
     } catch (error) {
       console.log(error);
@@ -82,6 +149,26 @@ export class NftService {
           nftId: +tokenId,
         },
       });
+      const nft = await this.prisma.nft.findUnique({
+        where: { tokenId: +tokenId },
+      });
+      const user = await this.prisma.user.findFirst({
+        where: { id: userId },
+      });
+      const owner = await this.prisma.user.findFirst({
+        where: { id: nft.ownerId },
+      });
+
+      if (nft) {
+        await this.notificationGateway.notifyUser(owner.address, {
+          type: 'LIKE',
+          avatar: user.avatar,
+          address: user.address,
+          image: nft.image,
+          message: `Liked your NFT`,
+          isRead: false,
+        });
+      }
     } catch (error) {
       console.log(error);
     }
@@ -295,7 +382,7 @@ export class NftService {
     return this.prisma.ownerHistory.findMany({
       where: { nftId: +nftId },
       include: { owner: true },
-      orderBy: { created_at: 'desc' }
+      orderBy: { created_at: 'desc' },
     });
   }
 }

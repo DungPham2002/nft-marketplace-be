@@ -9,6 +9,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { JwtStrategy } from './auth.jwt.strategy';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { NotificationGateway } from '../notification/notification.gateway';
+
 
 @Module({
   imports: [
@@ -17,7 +19,13 @@ import { AuthService } from './auth.service';
     }),
     PrismaModule,
   ],
-  providers: [UserService, AuthService, JwtStrategy, PrismaService],
+  providers: [
+    UserService,
+    AuthService,
+    JwtStrategy,
+    PrismaService,
+    NotificationGateway,
+  ],
   controllers: [AuthController],
 })
 export class AuthModule {}

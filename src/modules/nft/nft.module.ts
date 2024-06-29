@@ -6,11 +6,12 @@ import { PrismaModule } from '../prisma/prisma.module';
 
 import { NftController } from './nft.controller';
 import { NftService } from './nft.service';
+import { NotificationGateway } from '../notification/notification.gateway';
 
 @Module({
   imports: [JwtModule, PrismaModule],
   controllers: [NftController],
-  providers: [NftService, PrismaService],
+  providers: [NftService, PrismaService, NotificationGateway],
   exports: [NftService],
 })
 export class NftModule {}

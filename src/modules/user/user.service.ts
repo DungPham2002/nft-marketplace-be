@@ -5,10 +5,14 @@ import { toChecksumAddress } from 'web3-utils';
 import { PrismaService } from '../prisma/prisma.service';
 
 import { updateUserProfileDTO } from './dto/updateUserProfile.dto';
+import { NotificationGateway } from '../notification/notification.gateway';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly notificationGateway: NotificationGateway,
+  ) {}
 
   async findUser(
     userWhereUniqueInput: Prisma.UserWhereUniqueInput,
@@ -93,6 +97,19 @@ export class UserService {
           followedId: user.id,
           followerId: userId,
         }
+      })
+      const follower = await this.prisma.user.findFirst({
+        where: {
+          id: userId,
+        }
+      })
+      await this.notificationGateway.notifyUser(address, {
+        type: 'FOLLOW',
+        avatar: follower.avatar,
+        address: follower.address,
+        message: 'Followed you',
+        image: '',
+        isRead: false
       })
     } catch (error) {
       console.log(error)

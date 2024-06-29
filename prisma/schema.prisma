@@ -30,6 +30,7 @@ model User {
   follower            Follow[]               @relation("Follower")
   ownerHistory        OwnerHistory[]         @relation("OwnerHistory")
   bidderHistory       BidderHistory[]        @relation("BidderHistory")
+  notification        Notification[]         @relation("Notification")
 }
 
 model Nft {
@@ -143,4 +144,17 @@ model BidderHistory {
   updated_at          DateTime             @default(now()) @updatedAt
   auction             Auction              @relation("AuctionBidderHistory", fields: [auctionId], references: [id])
   bidder              User                 @relation("BidderHistory", fields: [bidderId], references: [id])
+}
+
+model Notification {
+  id                  Int                  @id @default(autoincrement())
+  userId              Int
+  type                String
+  avatar              String
+  userAddress         String
+  image               String
+  message             String
+  isRead              Boolean
+
+  user                User                  @relation("Notification", fields: [userId], references: [id])
 }
