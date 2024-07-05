@@ -75,11 +75,16 @@ export class NftService {
       });
       const nft = await this.prisma.nft.findFirst({
         where: { tokenId: tokenId },
+        include: { owner: true },
       });
-      const owner = await this.prisma.user.findFirst({
-        where: { id: nft.ownerId },
+      const oldOwnerAddress = nft.owner.address;
+      await this.prisma.ownerHistory.create({
+        data: {
+          ownerId: user.id,
+          nftId: tokenId,
+        },
       });
-      await this.notificationGateway.notifyUser(owner.address, {
+      await this.notificationGateway.notifyUser(oldOwnerAddress, {
         type: 'BUY',
         avatar: user.avatar,
         address: address,
@@ -91,13 +96,7 @@ export class NftService {
         where: { tokenId: tokenId },
         data: { ownerId: user.id, isSelling: false },
       });
-      await this.prisma.ownerHistory.create({
-        data: {
-          ownerId: user.id,
-          nftId: tokenId,
-        },
-      });
-      return 'Buy Success';
+      return 'Buy NFT Success';
     } catch (error) {
       console.log(error);
     }
